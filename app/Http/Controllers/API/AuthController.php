@@ -191,13 +191,24 @@ class AuthController extends Controller
             'email_verified_at' => now(),
         ])->save();
 
-        // Mark email as verified for the profile completion step
-        cache()->put("email_verified:{$request->email}", true, now()->addHours(1));
+        $token = null;
+        $nextStep = 'complete_profile';
+
+        if ($user->profile_complete) {
+            $token = $user->createToken('dating-app')->plainTextToken;
+            $nextStep = 'home';
+            cache()->forget("email_verified:{$request->email}");
+        } else {
+            // Mark email as verified for the profile completion step
+            cache()->put("email_verified:{$request->email}", true, now()->addHours(1));
+        }
 
         return response()->json([
             'message' => 'Email verified successfully.',
             'verified' => true,
-            'user' => $user,
+            'next_step' => $nextStep,
+            'user' => $user->fresh(),
+            'token' => $token,
         ]);
     }
 

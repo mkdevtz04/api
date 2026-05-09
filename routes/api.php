@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\OnboardingController;
 use App\Http\Controllers\API\ProfileController;
 use App\Http\Controllers\API\DiscoverController;
 use App\Http\Controllers\API\SwipeController;
@@ -21,9 +22,15 @@ Route::prefix('auth')->group(function () {
     Route::post('/email/send-otp',    [AuthController::class, 'sendEmailOtp']);
     Route::post('/email/verify-otp',  [AuthController::class, 'verifyEmailOtp']);
     Route::post('/email/complete-signup', [AuthController::class, 'completeEmailSignup']);
+    Route::post('/onboarding/gender', [OnboardingController::class, 'updateGender']);
+    Route::post('/onboarding/interests', [OnboardingController::class, 'updateInterests']);
+    Route::post('/onboarding/friends', [OnboardingController::class, 'updateFriendsPermission']);
+    Route::post('/onboarding/notifications', [OnboardingController::class, 'updateNotifications']);
     Route::post('/phone/send-otp',    [AuthController::class, 'sendOtp']);
     Route::post('/phone/verify-otp',  [AuthController::class, 'verifyOtp']);
 });
+
+Route::get('/discover', [DiscoverController::class, 'index']);
 
 /*
 |--------------------------------------------------------------------------

@@ -12,9 +12,10 @@ use Laravel\Sanctum\HasApiTokens;
 
 #[Fillable([
     'name', 'email', 'phone', 'password',
-    'avatar', 'bio', 'gender', 'dob',
+    'avatar', 'bio', 'gender', 'custom_gender', 'dob',
     'location', 'latitude', 'longitude',
     'intent', 'is_premium', 'profile_complete',
+    'find_friends_enabled', 'notifications_enabled',
     'filter_preferences',
 ])]
 class User extends Authenticatable
@@ -35,6 +36,8 @@ class User extends Authenticatable
         'password'            => 'hashed',
         'is_premium'          => 'boolean',
         'profile_complete'    => 'boolean',
+        'find_friends_enabled' => 'boolean',
+        'notifications_enabled' => 'boolean',
         'filter_preferences'  => 'array',
         'dob'                 => 'date',
         'latitude'            => 'decimal:7',
@@ -43,10 +46,10 @@ class User extends Authenticatable
 
     // ─── Relationships ────────────────────────────────────────────────
 
-    // public function interests(): HasMany
-    // {
-    //     return $this->hasMany(UserInterest::class);
-    // }
+    public function interests(): HasMany
+    {
+        return $this->hasMany(UserInterest::class);
+    }
 
     // public function photos(): HasMany
     // {
