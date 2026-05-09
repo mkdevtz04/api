@@ -179,12 +179,64 @@ class AuthController extends Controller
 
         cache()->forget("email_otp:{$request->email}");
 
-        // Mark email as verified (we'll store a flag for registration flow)
+        $user = User::firstOrCreate(
+            ['email' => $request->email],
+            [
+                'name' => strtok($request->email, '@') ?: 'User',
+                'password' => Hash::make(str()->random(32)),
+            ]
+        );
+
+        $user->forceFill([
+            'email_verified_at' => now(),
+        ])->save();
+
+        // Mark email as verified for the profile completion step
         cache()->put("email_verified:{$request->email}", true, now()->addHours(1));
 
         return response()->json([
             'message' => 'Email verified successfully.',
             'verified' => true,
+            'user' => $user,
+        ]);
+    }
+
+    /**
+     * Complete the email signup flow after OTP verification.
+     */
+    public function completeEmailSignup(Request $request)
+    {
+        $validated = $request->validate([
+            'email' => 'required|email|exists:users,email',
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'dob' => 'required|date|before_or_equal:' . now()->subYears(18)->toDateString(),
+        ]);
+
+        $isVerifiedInFlow = cache()->get("email_verified:{$validated['email']}");
+        $user = User::where('email', $validated['email'])->firstOrFail();
+
+        if (! $isVerifiedInFlow && ! $user->email_verified_at) {
+            return response()->json([
+                'message' => 'Verify your email with OTP before completing profile.',
+            ], 422);
+        }
+
+        $user->update([
+            'name' => trim($validated['first_name'] . ' ' . $validated['last_name']),
+            'dob' => $validated['dob'],
+            'profile_complete' => true,
+            'email_verified_at' => $user->email_verified_at ?? now(),
+        ]);
+
+        cache()->forget("email_verified:{$validated['email']}");
+
+        $token = $user->createToken('dating-app')->plainTextToken;
+
+        return response()->json([
+            'message' => 'Profile completed successfully.',
+            'user' => $user->fresh(),
+            'token' => $token,
         ]);
     }
 }

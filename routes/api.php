@@ -20,6 +20,7 @@ Route::prefix('auth')->group(function () {
     Route::post('/login',             [AuthController::class, 'login']);
     Route::post('/email/send-otp',    [AuthController::class, 'sendEmailOtp']);
     Route::post('/email/verify-otp',  [AuthController::class, 'verifyEmailOtp']);
+    Route::post('/email/complete-signup', [AuthController::class, 'completeEmailSignup']);
     Route::post('/phone/send-otp',    [AuthController::class, 'sendOtp']);
     Route::post('/phone/verify-otp',  [AuthController::class, 'verifyOtp']);
 });
