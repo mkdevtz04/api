@@ -22,12 +22,14 @@ class DiscoverController extends Controller
 
         $profiles = User::query()
             ->with('interests')
+            ->where('id', '!=', $viewer?->id)
             ->when(
                 $viewer,
-                fn ($query) => $query->where('id', '!=', $viewer->id)
+                function ($query) use ($viewer) {
+                    // Filter by opposite gender
+                    return $query->where('gender', '!=', $viewer->gender);
+                }
             )
-            ->whereNotNull('avatar')
-            ->where('profile_complete', true)
             ->latest()
             ->take(12)
             ->get()
