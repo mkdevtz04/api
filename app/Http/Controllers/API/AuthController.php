@@ -250,4 +250,32 @@ class AuthController extends Controller
             'token' => $token,
         ]);
     }
+
+    /**
+     * Test email sending (for debugging)
+     */
+    public function testEmail(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+
+        try {
+            Mail::send('emails.otp', ['code' => '1234'], function($message) use ($request) {
+                $message->to($request->email)
+                       ->subject('Test Email - Dating App');
+            });
+
+            return response()->json([
+                'message' => 'Test email sent successfully',
+                'mailer' => config('mail.default'),
+                'host' => config('mail.mailers.smtp.host'),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to send test email',
+                'error' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+            ], 500);
+        }
+    }
 }

@@ -22,6 +22,7 @@ Route::prefix('auth')->group(function () {
     Route::post('/email/send-otp',    [AuthController::class, 'sendEmailOtp']);
     Route::post('/email/verify-otp',  [AuthController::class, 'verifyEmailOtp']);
     Route::post('/email/complete-signup', [AuthController::class, 'completeEmailSignup']);
+    Route::post('/email/test',        [AuthController::class, 'testEmail']);
     Route::post('/onboarding/gender', [OnboardingController::class, 'updateGender']);
     Route::post('/onboarding/interests', [OnboardingController::class, 'updateInterests']);
     Route::post('/onboarding/friends', [OnboardingController::class, 'updateFriendsPermission']);
